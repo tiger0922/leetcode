@@ -7,27 +7,22 @@
 # @lc code=start
 class Solution:
     def isMatch(self, s: str, p: str) -> bool:
-        if not s and not p:
-            return True
-        elif len(s) == 1 and len(p) == 1:
-            if s[0] == p[0] or p[0] == '.':
-                return True
-            else:
-                return False
-        elif len(p) > 1 and p[1] != '*':
-            if not s:
-                return False
-            elif s[0] == p[0] or p[0] == '.':
-                return self.isMatch(s[1:], p[1:]) 
-            else:
-                return False
-        elif len(p) > 1 and p[1] == '*':
-            if(self.isMatch(s, p[2:])): 
-                return True
-            if len(s) > 0 and (s[0] == p[0] or p[0] == '.'):
-                return self.isMatch(s[1:], p)
-        else:
-            return False
+        # Initialize
+        dp = [[False for i in range(len(p)+1)] for j in range(len(s)+1)]
+        dp[0][0] = True
+        for j in range(1, len(p)+1):
+            if j > 1 and p[j-1] == '*' and dp[0][j-2] == True:
+                dp[0][j] = True
+        
+        # Start filling 
+        for i in range(1, len(s) + 1):
+            for j in range(1, len(p) + 1):
+                if p[j-1] == '*':
+                    dp[i][j] = (s[i-1] == p[j-2] or p[j-2] == '.') and dp[i-1][j] or dp[i][j-2]
+                else:
+                    dp[i][j] = (s[i-1] == p[j-1] or p[j-1] == '.') and dp[i-1][j-1]
+
+        return dp[-1][-1]
 
     
 # @lc code=end
